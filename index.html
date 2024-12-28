@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./bootstrap.min.css">
+    <title>To do list</title>
+    <style>
+        .d_flex {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 2vw;
+        }
+        .task-card {
+            width: 100%;
+            max-width: 400px;
+            margin: 10px;
+        }
+        .task-card h5 {
+            margin-bottom: 10px;
+        }
+        .task-card input {
+            margin-bottom: 10px;
+        }
+        .task-card button {
+            width: 48%;
+        }
+    </style>
+</head>
+<body class="p-5">
+    <input type="color" name="bg_color" id="bg_color" value="#ffffff" class="form-control p-2 text-center mb-3">
+    <section class="p-5">
+        
+        <label for="user_task"><h3>Write your task</h3></label>
+        <input type="text" id="user_task" class="form-control w-75 mb-3">
+        <button class="btn btn-dark m-1" onclick="add_end_task()">Add task to the end</button>
+        <button class="btn btn-dark m-1" onclick="add_start_task()">Add task to the beginning</button>
+        <button class="btn btn-dark m-1" onclick="remove_last_task()">Remove last task</button>
+        <button class="btn btn-dark m-1" onclick="remove_first_task()">Remove first task</button>
+
+        <div class="bg-light p-1 w-100 mt-3">
+            <div id="heading" class="p-2">
+                <h3>No tasks added</h3>
+            </div>
+            <ol id="content" class="d_flex"></ol>
+        </div>
+        <input type="hidden" id="edit_task_id" class="d-none" value="">
+    </section>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var user_color = localStorage.getItem('user_color');
+        var bg_color = document.getElementById('bg_color');
+        var body = document.body;
+        var welcome_text = document.getElementById('welcome_text');
+        var user_task = document.getElementById('user_task');
+        var content = document.getElementById('content');
+        var heading = document.getElementById('heading');
+
+        if (user_color) {
+            body.style.backgroundColor = user_color;
+            bg_color.value = user_color;
+        } else {
+            console.log("This user is colorless 😢🥲🫵🏿🎭");
+        }
+
+        bg_color.addEventListener('input', function() {
+            localStorage.setItem('user_color', bg_color.value);
+            body.style.backgroundColor = bg_color.value;
+        });
+
+        const task_list = [];
+
+        function add_end_task() {
+            if (user_task.value.trim() === '') {
+                alert('Don\'t leave it empty');
+            } else {
+                var new_task = user_task.value.trim();
+                var new_task_add = `You need to ${new_task.toLowerCase()}.`;
+                task_list.push(new_task_add);
+                display();
+            }
+        }
+
+        function add_start_task() {
+            if (user_task.value.trim() === '') {
+                alert('Don\'t leave it empty');
+            } else {
+                var new_task = user_task.value.trim();
+                var new_task_add = `You need to ${new_task.toLowerCase()}.`;
+                task_list.unshift(new_task_add);
+                display();
+            }
+        }
+
+        function remove_last_task() {
+            task_list.pop();
+            display();
+        }
+
+        function remove_first_task() {
+            task_list.shift();
+            display();
+        }
+
+        function del_task(i) {
+            task_list.splice(i, 1);
+            display();
+        }
+
+        function edit_task(i) {
+            var edited_task = document.getElementById(`edited_task_${i}`).value.trim();
+            if (edited_task) {
+                task_list[i] = `You need to ${edited_task}.`;
+                display();
+            } else {
+                alert('Task cannot be empty');
+            }
+        }
+
+        function display() {
+            user_task.value = '';
+            heading.innerHTML = task_list.length ? '<h4>Your tasks</h4>' : '<h3>No tasks added</h3>';
+            content.innerHTML = task_list.map((task, i) => `
+                <li class="m-2">
+                    <div class="card task-card p-3">
+                        <h5>${task}</h5>
+                        <input type="text" placeholder="Edit your task" id="edited_task_${i}" class="form-control">
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-danger p-2" onclick="del_task(${i})">Delete</button>
+                            <button class="btn btn-success p-2" onclick="edit_task(${i})">Edit</button>
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Attach functions to global scope
+        window.add_end_task = add_end_task;
+        window.add_start_task = add_start_task;
+        window.remove_last_task = remove_last_task;
+        window.remove_first_task = remove_first_task;
+        window.del_task = del_task;
+        window.edit_task = edit_task;
+    });
+</script>
+</html>
